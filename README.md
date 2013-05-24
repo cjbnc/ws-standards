@@ -8,7 +8,7 @@ they are welcome to do so, but that is not the aim.
 Proposing a Standards Recommendation
 ------------------------------------
 
-To propose a standards recommendation (PSR):
+To propose a web services standards recommendation (WSSR):
 
-- fork this repo, create a branch, checkout that branch, add the PSR in
+- fork this repo, create a branch, checkout that branch, add the WSSR in
   `proposed/`, push the branch to Github, and send a pull request.
