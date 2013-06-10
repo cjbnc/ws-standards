@@ -1,117 +1,61 @@
-# RESTful API Style Guide (DRAFT)
+# Basic RESTful Service Standards (DRAFT)
 
-The intent of this guide is to increase interoperability between web services on campus. It does so
-by enumerating a shared set of rules and expectations about how to build and maintain RESTful web services.
+The intent of this document is to provide guidance on the implementation of RESTful web services according to the constraints set forth in [WSSR-0].
+It does so by enumerating a distributed set of rules, expectations, and best practices about how to build and maintain RESTful web services.
 
-The style rules are derived from commonalities among the various projects. When various authors
-collaborate across multiple projects, it helps to have one set of guidelines to be used among all those projects.
-Thus, the benefit of this guide is not in the rules themselves, but in the sharing of those rules.
+The scope of this web services standards recommendation is to:
+* Specify basic requirements to fulfill RESTful constraints
+* Specify requirements for service endpoint URL construction, resource naming, and methods for operating on resources.
+* Specify requirements for requests made to services.
+* Specify requirements for responses given to clients of services.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
 and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 [RFC 2119]: http://www.ietf.org/rfc/rfc2119.txt
-[WSSR-0]: https://github.ncsu.edu/ncsu-interop-group/ws-standards/blob/constraints-and-style-guidelines/proposed/WSSR-0-restful-constraints.md
+[WSSR-0]: https://github.ncsu.edu/ncsu-interop-group/ws-standards/blob/master/proposed/WSSR-0-restful-constraints.md
 [SEMVER]: http://semver.org/spec/v2.0.0-rc.2.html
+
 ## Overview
 
 * All services MUST adhere to the constraints set in [WSSR-0][].
-* [RESTful URLs](#restful-urls)
-* [API Versioning](#api-versioning)
-* [Content Negotiation](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/9)
-* [Request & Response Examples](#request--response-examples)
+* [RESTful URLs and Actions](#restful-urls-and-actions)
+    * [Resource Naming](#resource-naming)
+    * [HTTP Methods](#http-methods--verbs)
+        * [Safe and Idempotent Methods](#safe-and-idempotent-http-methods)
+        * [Use HTTP Methods to Act on Resources](#use-http-methods-to-act-on-resources)
+        * [Mapping Relationships Between Resources](#relationships-between-resources)
+        * [Custom Actions Outside of CRUD Operations](#custom-actions-outside-of-crud-operations)
+* [API Requests](#api-requests)
+    * [Filtering, Sorting, Searching Results, and Limiting Fields Returned](#filtering-sorting-searching-results-and-limiting-fields-returned)
+    * [Specifying Record Limits](#specifying-record-limits)
+    * [Specifying API Version](#specifying-api-version)
+    * [Specifying Media Type](#specifying-media-type)
+    * [Request Body](#request-body)
+* [API Responses](#api-responses)
+    * [Use HTTP Response / Status Codes](#use-http-response--status-codes)
+    * [Response Body](#response-body)
 
-## RESTful URLs
+## RESTful URLs and Actions
 
-### General Guidelines for RESTful URLs
+The constraints of [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) describe the segregation of logical resources within a web service.  These resources are
+acted upon using HTTP requests using the standard HTTP methods / verbs: GET, POST, PUT, PATCH, and DELETE.
 
-* URLs MUST identify a resource in the URL and MUST NOT use the query string to specify the resource.
-* URLs MUST include nouns, not verbs.
-* URLs SHOULD use plural nouns only for consistency (no singular nouns).
-* URLs MUST use HTTP verbs (GET, POST, PUT, DELETE) to operate on collections and elements.
-* URLs SHOULD NOT go deeper than resource/:id/resource/:id.
-* API version SHOULD BE specified in headers as specified below.  However, the version number MAY be placed in the URL base as an alternative.
-    * https://api.ncsu.edu/v1/resource/:id
-* Requests SHOULD specify expected content-type in headers as specified below.  However, requests MAY specify content-type as an extension.
-* URLs MAY specify resource filters in the query string using a comma separated list.
+### Resource Naming
 
-### Good URL examples
+* Resource names MUST be represented as nouns.
+* Resource names MUST use their plural form.
+* Resource fields MUST use ```snake_case``` in all RESTful interactions. **Note: This excludes libraries that consume the service.  Libraries are subject to the coding standards for the language their written in.**
+* There is no requirement for resources to map one-to-one with underlying models.  The idea is to abstract away technical detail from the API consumer.
 
-* List of Students:
-    * GET https://api.example.edu/v1/students.json
+### HTTP Methods / Verbs
 
-* Filtering as a query string:
-    * GET https://api.example.edu/v1/students.json?major=mae
-    * GET https://api.example.edu/v1/students.json?class=sophomore&major=csc,mae,ece
+* HTTP Methods MUST be used to operate on collections and elements in the API.
+* API MUST NOT include verbs as part of the URL with a few exceptions detailed [below](#custom-actions-outside-of-crud-operations).
 
-* A single student in XML format:
-    * GET https://api.example.edu/v1/students/cacard2.xml
+#### Safe and Idempotent HTTP Methods
 
-* All classes a student is currently taking:
-    * GET https://api.example.edu/v1/students/cacard2/classes.json
-     
-* Specify optional fields in a comma separated list:
-    * GET https://api.example.edu/v1/students.json?filter=displayName,class,major
-
-* Add a class to student roster:
-    * POST https://api.example.edu/v1/students/cacard2/classes
-
-* Drop a class from student roster:
-    * DELETE https://api.example.edu/v1/students/cacard2/classes/1234
-
-### Bad URL examples
-
-* Non-plural noun:
-    * GET https://api.example.edu/v1/student
-    * GET https://api.example.edu/v1/student/1234
-    * GET https://api.example.edu/v1/student/cacard2/class
-
-* Verb in URL, Unsafe GET request:
-    * GET https://api.example.edu/v1/students/cacard2/create
-
-* Filter outside of query string
-    * GET https://api.example.edu/v1/students/sophomore/csc
-
-## API Versioning
-
-* APIs SHOULD process version numbers through the "Accept" header.  
-* APIs MAY use the URL to specify version at the base of the URL.
-* APIs MUST NOT accept any requests that do not specify a version number.
-* Developers MUST NOT release an API without a version number.
-* API version numbers MUST adhere to [SEMVER].
-
-### API Version in Headers (Preferred)
-
-@todo
-[#8](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/8)
-
-### API Versioning in URL
-
-@todo
-[#8](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/8)
-
-## API Requests
-
-### Use HTTP Methods to Act on Resources
-
-The HTTP verbs satisfy much of the "Uniform Interface" constraint set in [WSSR-0] and provide a set of standardized actions
-that can act on noun-based resources.  The most commonly used HTTP verbs are POST, GET, PUT, and DELETE.  These four verbs/methods
-form what is known as CRUD (Create, Read, Updated, and Delete) operations.
-
-The table below represents constraints APIs MUST adhere to when implementing service resources that HTTP verbs/methods act on:
-
-| HTTP Verb / Method | Description of Use | Safe | Idempotent |
-| ---------- | ---------- | ---------- | ---------- |
-| GET | The GET method is used to read a representation of a resource. | Y | Y |
-| PUT | The PUT method is used for resource updates.  PUT-ing to a resource with the request body containing the newly-updated representation of the resource should update that resource.  PUT MUST NOT be used to create new resources. | N | Y |
-| POST | The POST method is used for creation of new resources, particularly subordinate resources. | N | N |
-| DELETE | The DELETE method is used for deletion of a particular resource.  | N | ? |
-
-DELETE verbs/methods are idempotent according to the HTTP spec.  If you DELETE a resource, it's removed and will be removed on the next DELETE call.  In the
-realm of web services, however, repeated calls to DELETE a resource may result in a 404 (Not Found) if resources are hard-deleted rather than soft.  This is an
-accepted compromise of the HTTP specification because certain applications will warrant hard deletion of resources while others may not.
-
-### Safe and Idempotent
+This section is included for completion as a definition of Safe and Idempotent methods, as defined by W3.  These terms complement intended behavior of certain HTTP methods.
 
 Taken from [www.w3.org](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
 
@@ -129,97 +73,217 @@ Taken from [www.w3.org](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
 >However, it is possible that a sequence of several requests is non- idempotent, even if all of the methods executed in that sequence are idempotent. (A sequence is idempotent if a single execution of the entire sequence always yields a result that is not changed by a reexecution of all, or part, of that sequence.) For example, a sequence is non-idempotent if its result depends on a value that is later modified in the same sequence.
 >A sequence that never has side effects is idempotent, by definition (provided that no concurrent operations are being executed on the same set of resources).
 
+#### Use HTTP Methods to Act on Resources
+
+The HTTP verbs satisfy much of the "Uniform Interface" constraint set in [WSSR-0] and provide a set of standardized actions
+that can act on noun-based resources.  The most commonly used HTTP verbs are POST, GET, PUT, and DELETE.  These four verbs/methods
+form what is known as CRUD (Create, Read, Update, and Delete) operations.  PATCH is an additional HTTP verb used for partial updates and
+is defined below.
+
+The table below represents constraints APIs MUST adhere to when implementing service resources that HTTP verbs/methods act on:
+
+| HTTP Verb / Method | Description of Use | Safe | Idempotent |
+| ---------- | ---------- | ---------- | ---------- |
+| GET | The GET method is used to read a representation of a resource. | Y | Y |
+| POST | The POST method is used for creation of new resources, particularly subordinate resources. | N | N |
+| PUT | The PUT method is used for resource updates.  PUT-ing to a resource with the request body containing the newly-updated representation of the resource should update that resource.  PUT SHOULD NOT be used to create new resources. | N | Y |
+| DELETE | The DELETE method is used for deletion of a particular resource.  | N | ? |
+
+##### Example
+
+The examples below demonstrate using HTTP verbs to operate on web service resources to perform basic CRUD operations.
+
+* ```GET /students``` - Retrieves a list of student elements
+* ```GET /students/cacard``` - Retrieves a single student element
+* ```POST /students``` - Creates a new student
+* ```PUT /students/cacard``` - Updates student "cacard"
+* ```DELETE /students/cacard``` - Deletes student "cacard"
+
+#### Relationships Between Resources
+
+There will be times when you need to be able to easily provide a list of "sub-resources" or "resources owned by another resource".  Relationships
+can be mapped using the URL with certain constraints:
+
+* URL depth MUST NOT exceed /resource/:id/resource/:id
+
+##### Example
+
+* ```GET /students/cacard/classes``` - Retrieves a list of classes for student "cacard"
+* ```GET /students/cacard/classes/csc316``` - Retrieves a specific class student "cacard" is enrolled in
+* ```POST /students/cacard/classes``` - Enrolls student "cacard" in a class
+* ```DELETE /students/cacard/classes/csc316``` - Removes student "cacard" from a specific class
+
+#### Custom Actions Outside of CRUD Operations
+
+There will be use cases for actions that need to be performed on resources outside of typical CRUD operations.  These usually
+include toggling attributes of a resource.  In those cases, use best judgement and document your decision in conjunction with
+considering the following constraints:
+
+* It is RECOMMENDED that custom actions be implemented as a property of a resource and modified through a PUT or PATCH HTTP method (e.g.
+activating a resource MAY be implemented by setting a property named "activated" on the resource model)
+* However, custom actions MAY be implemented as a "sub-resource" sparingly and with appropriate documentation (e.g. GitHub's API
+allows a gist to be starred with ```PUT /gists/:id/star``` and unstarred with ```DELETE /gists/:id/star```.
+
+## API Requests
+
+### Filtering, Sorting, Searching Results, and Limiting Fields Returned
+
+#### Filtering
+
+[Discuss more Advanced Filtering Options](#12)
+
+* APIs MUST use a unique query parameter for every resource field that implements filtering.
+* Filters MUST be mapped to the query string and MUST NOT be included in the resource mapping.
+* Multiple filters on one resource field MUST be separated by comma.
+
+##### Examples
+
+* ```GET students?major=mae``` - Retrieves a list of MAE students.
+* ```GET students?major=mae,csc``` - Retrieves a list of MAE and CSC students.
+
+#### Sorting
+
+* APIs MUST use a generic query parameter, ```sort```, to describe sorting rules.
+* APIs MUST allow for a comma separated list of resource fields to sort, each with a unary negative, per field, to specify descending order.
+* APIs MUST process sorted fields from left to right.
+
+##### Examples
+
+* ```GET students?sort=last_name,first_name``` - Get list of students sorted by last name, ascending, and first name, ascending.
+* ```GET errors?sort=-created_date``` - Get list of most recent errors.
+
+#### Searching Results
+
+* Full text searches, where implemented, MUST be implemented through a generic query parameter, ```q```.
+
+##### Example
+
+* ```GET errors?q=php``` - Get list of errors mentioning the keyword "php".
+
+#### Limiting Fields Returned
+
+* APIs that allow for limiting fields returned for a resource MUST implement that functionality as a generic query parameter, ```fields```.
+* Multiple fields MUST be specified as a comma-separated list.
+
+##### Example
+
+* ```GET students?fields=unity,first_name,last_name``` - Get list of students, but only include Unity ID, first and last name.
+
+### Specifying Record Limits
+
+
+### Specifying API Version
+
+* APIs MUST be versioned.
+* API version numbers MUST adhere to [SEMVER].
+* APIs SHOULD include version numbers in request headers as specified [below](#using-the-accept-header).
+* APIs MAY use the URL to specify version at the base of the URL as specified [below](#using-the-url).
+* APIs MUST NOT accept any requests that do not specify a version number.
+
+#### Using the Accept Header (Preferred)
+
+The following constraints are placed on APIs who implement "Specifying API Version Using the Accept Header":
+
+* API version MUST be included as part of the Accept header as specified below.
+* API version MUST be included as part of the Content-Type header in all responses as specified below.
+
+In the example below, notice that request response content type is specified as JSON in the Accept header as well.  This is documented at [Specifying Media Type](#specifying-media-type).
+
+```
+===>
+GET /students/cacard HTTP/1.1
+Accept: application/vendor.api-v1+json
+
+<===
+HTTP/1.1 200 OK
+Content-Type: application/vendor.api-v1+json
+
+...
+```
+
+#### Using the URL
+
+While it is STRONGLY advised to use request headers for specifying version, developers are allowed to use the URL to specify version.
+
+* If version is included in the URL, it MUST be placed at the base.
+* URL Aliasing SHOULD be done if possible (e.g. v1.0 could alias to v1).  
+
+##### Examples
+
+* https://api.ncsu.edu/v1/resource/:id
+* https://api.ncsu.edu/v1.1/resource/:id
+* https://api.ncsu.edu/v2/resource/:id
+
+### Specifying Media Type
+
+* APIs MUST document supported media types for both requests and responses.
+* API requests SHOULD specify media type as part of the URL through an appropriate "file extension".
+* API requests MAY specify media type in addition or solely in the Accept header for the request.
+* API responses MUST include requested media type in the Content-Type header.
+
+#### Using the URL
+
+* APIs that specify media type in the URL MUST do so as an extension appended to the URL before query string arguments.
+* Extensions in the URL MUST only specify requested response media type.
+
+##### Examples
+
+* https://api.ncsu.edu/v1/resource.json
+* https://api.ncsu.edu/v1/resource/:id.xml
+
+#### Using the Header
+
+* APIs that specify media type in the header MUST do so in the Accept header.
+
+In the example below, both the requested API version and media type are included in the Accept header and the same information is included in the response.
+
+```
+===>
+GET /students/cacard HTTP/1.1
+Accept: application/vendor.api-v1+json
+
+<===
+HTTP/1.1 200 OK
+Content-Type: application/vendor.api-v1+json
+
+...
+```
+
+#### Conflicting URL / Header Content-types
+
+* Requests that specify conflicting content types in the URL and the Accept header MUST reject the request with a series 4xx Bad Request response (e.g. 406 Not Acceptable)
+
 ### Request Body
-
-[Open for Discussion](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/6)
-
-#### Specifying Record Limits
-
-* If no limit is specified, an API MUST return results with a default limit.
-* To get records 50 through 75 do this:
-    * https://api.ncsu.edu/students.json?limit=25&offset=50
-    * offset=50 means, ‘begin with record number fifty’
-    * limit=25 means, ‘return 25 records’
-* Information about record limits SHOULD also be included in the Example response. 
- 
-Example:
-
-    {
-        "metadata": {
-            "resultset": {
-                "count": 50,
-                "offset": 25,
-                "limit": 25
-            }
-        },
-        "results": [
-            { .. }
-        ]
-    }
 
 ## API Responses
 
-### Relevant HTTP Response / Status Codes
+### Use HTTP Response / Status Codes
 
-#### Success
-200 - OK
+[Open for Discussion](#7)
 
-201 - Created
-
-204 - No Content
-
-#### Request Errors
-400 - Bad Request
-
-401 - Unauthorized
-
-403 - Forbidden
-
-404 - Not Found
-
-405 - HTTP Method Not Allowed
-
-#### Server Errors
-500 - Internal Server Error
-
-[Open for Discussion](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/7)
+* 200 OK - Response to a successful GET, PUT, PATCH or DELETE.  Can also be used for a POST that doesn't result in a creation.
+* 201 Created - Response to a POST that results in a creation.
+* 202 Accepted - The request has been accepted for processing, but the processing has not been completed.
+* 204 No Content - Response to a successful request that won't be returning a response body.
+* 304 Not Modified - Used for HTTP caching.
+* 400 Bad Request - Request body isn't parse-able.
+* 401 Unauthorized - When no or invalid authentication details are given.
+* 402 Payment Required - Highly Specialized, Reserved
+* 403 Forbidden - Authentication succeeded but user is not authorized to use requested resource.
+* 404 Not Found - Response to a request for a resource that doesn't exist.
+* 405 Method Not Allowed - Used when an HTTP method is not allowed for an authenticated user (can GET a resource, but not POST/PUT)
+* 410 Gone - Indicates the resource is no longer available (i.e. removed after deprecation)
+* 415 Unsupported Media Type - If a content type is requested that is not supported by the service (e.g. requests XML from a JSON-only service)
+* 422 Unprocessable Entity - Used for validation errors
+* 429 Too Many Requests - Rate Limit reached
+* 500 Internal Server Error
+* 501 Not Implemented - The service does not support the functionality required to fulfill the request.
+* 502 Bad Gateway - This could be used to highlight unexpected errors as requests pass through abstraction layers (e.g. authentication => authorization => rate=limiters => resource endpoint)
+* 503 Service Unavailable - Oh snap the world is ending.
 
 ### Response Body
 
-* Values MUST not be included inside keys
-* Keys SHOULD NOT use internal-specific names (e.g. "node" and "taxonomy term")
-* Metadata SHOULD only contain direct properties of the response set and SHOULD NOT include properties of the members of the response set
-
-#### Good examples
-
-No values in keys:
-
-    "tags": [
-        {
-            "id": "125",
-            "name": "Environment"
-        },
-        {
-            "id": "834",
-            "name": "Water Quality"
-        }
-    ]
-
-
-#### Bad examples
-
-Values in keys:
-
-    "tags": [
-        {
-            "125": "Environment"
-        },
-        {
-            "834": "Water Quality"
-        }
-    ],
-
-### Handling Errors
+#### Handling Errors
 
 Error responses should include a common HTTP status code, message for the developer, message for the end-user (when appropriate), internal error code (corresponding to some specific internally determined error number), links where developers can find more info. For example:
 
@@ -229,49 +293,4 @@ Error responses should include a common HTTP status code, message for the develo
         "userMessage" : "This is a message that can be passed along to end-users, if needed.",
         "errorCode" : "444444",
         "moreInfo" : "Could include links to API documentation for resource request, etc",
-    }
-
-## Request & Response Examples
-
-### API Resources
-
-  - [GET /students](#get-magazines)
-  - [GET /students/:id](#get-studentsid)
-  - [POST /students/:id/classes](#post-studentsidclasses)
-
-### GET /students
-
-Example: https://api.ncsu.edu/v1/students.json
-
-    {
-        "metadata": {
-            "resultset": {
-                "count": 43283,
-                "offset": 0,
-                "limit": 10
-            }
-        },
-        "results": [
-            {
-                "id": "000000000",
-                "uid": "cacard",
-                "displayName": "Carrie A. Card"
-            },
-            {
-                "id": "000000001",
-                "uid": "cacard2",
-                "displayName": "Carrie A. Card"
-            },
-            { ... } x 8
-        ]
-    }
-
-### GET /students/:id
-
-Example: https://api.ncsu.edu/v1/students/cacard.json
-
-    {
-        "id": "000000000",
-        "uid": "cacard",
-        "displayName": "Carrie A. Card"
     }
