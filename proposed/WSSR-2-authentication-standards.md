@@ -59,4 +59,4 @@ Authentication systems that use static keys MUST abide by the following constrai
 * Keys consist of at least 8 alphanumeric characters
 * Keys do not contain characters outside the standard visible ASCII range (0x20-0x7E)
 
-It is RECOMMENDED that keys are constructed in such a manner that they are easily validated without a database lookup. Implementation of such construction is outside the scope of this document.
+It is RECOMMENDED that keys are constructed in such a manner that they are easily validated without a database lookup. This allows the system to drop malformed keys without consuming additional resources. Verification that the key is in use and what the scope is will require a lookup, but the syntactic validation of the key does not. Implementation of such construction is outside the scope of this document.
