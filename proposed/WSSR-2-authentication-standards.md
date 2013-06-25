@@ -33,7 +33,7 @@ It is REQUIRED that all authentication endpoints implement a static, time-based 
 
 ### OAuth 2.0
 
-OAuth 2.0 is the RECOMMENDED framework for all authentication systems in which a client will be acting on behalf of an end-user, or needs to access protected resources owned by the end-user that it does not already have explicit access to. This is referred to as 3-legged OAuth. For situations in which the client will be interfacing directly with the server with no interaction or authorization required from an end-user (2-legged OAuth) it is RECOMMEDNED to use a static key system or OAuth 1.0a instead; however, 2-legged OAuth using OAuth 2.0 MAY be used if desired. All implementations of OAuth 2.0 MUST adhere to the specification defined in [RFC6749](http://tools.ietf.org/html/rfc6749), as well as the following constraints:  
+OAuth 2.0 is the RECOMMENDED framework for all authentication systems in which a client will be acting on behalf of an end-user, or needs to access protected resources owned by the end-user that it does not already have explicit access to. This is referred to as 3-legged OAuth. For situations in which the client will be interfacing directly with the server with no interaction or authorization required from an end-user (2-legged OAuth) it is RECOMMENDED to use a static key system or OAuth 1.0a instead; however, 2-legged OAuth using OAuth 2.0 MAY be used if desired. All implementations of OAuth 2.0 MUST adhere to the specification defined in [RFC6749](http://tools.ietf.org/html/rfc6749), as well as the following constraints:  
 
 * Access tokens MUST NOT persist longer than 24 hours.
 * Access tokens SHOULD NOT be stored in a location accessible to anyone but the authentication server
