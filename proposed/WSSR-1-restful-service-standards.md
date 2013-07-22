@@ -45,7 +45,7 @@ acted upon using HTTP requests using the standard HTTP methods / verbs: GET, POS
 
 * Resource names MUST be represented as nouns.
 * Resource names MUST use their plural form.
-* Resource fields MUST use ```snake_case``` in all RESTful interactions. **Note: This excludes libraries that consume the service.  Libraries are subject to the coding standards for the language their written in.**
+* Resource fields MUST use ```snake_case``` in all RESTful interactions. **Note: This excludes libraries that consume the service.  Libraries are subject to the coding standards for the language they're written in.**
 * There is no requirement for resources to map one-to-one with underlying models.  The idea is to abstract away technical detail from the API consumer.
 
 ### HTTP Methods / Verbs
