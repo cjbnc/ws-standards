@@ -130,7 +130,7 @@ The HTTP Authorization header is supposed to be processed by the web server. Apa
 
 ### What about replay attacks?
 
-This mechanism as currently proposed does not prevent the same request from being processed twice. The timestamp can only limit how soon a duplicate requests could be made.
+This mechanism as currently proposed does not prevent the same request from being processed twice. The timestamp can only limit how soon a duplicate request could be made.
 
 A better mechanism would include some sort of unique request ID in the signed data. It would also require that every request include a unique request ID, and that the web service be able to track seen requests. This would almost certainly require a shared database for a service running on multiple servers. 
 
