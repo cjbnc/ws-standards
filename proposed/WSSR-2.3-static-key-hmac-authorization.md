@@ -8,7 +8,7 @@ This mechanism is designed for two-legged authentication. The web service and th
 
 ### Static keys
 
-The web service is responsible for issuing static key pairs to the clients. Each client should be given a key pair consisting of a KEYID and KEYDATA. 
+The web service is responsible for issuing static key pairs to the clients. Each client should be given a key pair consisting of a KEYID and KEYDATA. The web service can store these key pairs in any way that is convenient. It will need to be able to lookup the KEYDATA for a given KEYID when validating the requests.
 
 - KEYID = a short identifying string. Recommended 8 alpha-numeric characters.
 
@@ -114,13 +114,19 @@ The web service should perform each of the following steps when validating an in
 
 ### Servers
 
-- Perl - a plugin module for the Dancer framework is being developed. 
+- Perl - a plugin module for the [Dancer framework](http://perldancer.org/) is being developed. 
 
 ## Points for discussion
 
 ### Why not use the Authorization header?
 
-The HTTP Authorization header is supposed to be processed by the web server. Apache does not pass it along to scripts because it considers that to be a security risk. Given that Basic Auth passed the username/password pair as encoded clear text, passing that along to a script to read could be a problem. Rather than fight with reconfiguring Apache to break this security measure, it seemed better to use a custom header that would be passed along.
+The HTTP Authorization header is supposed to be processed by the web server. Apache does not pass it along to scripts because it considers that to be a security risk. Given that Basic Auth passes the username/password pair as encoded clear text, passing that along to a script to read could be a problem. Rather than fight with reconfiguring Apache to break this security measure, it seemed better to use a custom header that would be passed along.
+
+## What is the right response code for an authentication failure?
+
+- 400 Bad Request - kind of fits.
+- 401 Unauthorized - fits, except that it expects you to use the Authorization header. 
+- 403 Forbidden - also kind of fits. 
 
 ### What about replay attacks?
 
@@ -128,5 +134,5 @@ This mechanism as currently proposed does not prevent the same request from bein
 
 A better mechanism would include some sort of unique request ID in the signed data. It would also require that every request include a unique request ID, and that the web service be able to track seen requests. This would almost certainly require a shared database for a service running on multiple servers. 
 
-I think OAuth 1.0a, or two-legged OAuth, handles this better. 
+Does OAuth 1.0a handle this already? If so, use that if you need it.
 
