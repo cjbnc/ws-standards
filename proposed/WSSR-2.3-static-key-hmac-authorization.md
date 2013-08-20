@@ -122,7 +122,7 @@ The web service should perform each of the following steps when validating an in
 
 The HTTP Authorization header is supposed to be processed by the web server. Apache does not pass it along to scripts because it considers that to be a security risk. Given that Basic Auth passes the username/password pair as encoded clear text, passing that along to a script to read could be a problem. Rather than fight with reconfiguring Apache to break this security measure, it seemed better to use a custom header that would be passed along.
 
-## What is the right response code for an authentication failure?
+### What is the right response code for an authentication failure?
 
 - 400 Bad Request - kind of fits.
 - 401 Unauthorized - fits, except that it expects you to use the Authorization header. 
