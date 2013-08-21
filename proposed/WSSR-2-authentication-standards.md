@@ -65,22 +65,6 @@ are RECOMMENDED instead, while OAuth 2.0 is RECOMMENDED for use in 3-legged auth
 
 ### Static Keys
 
-A static key is defined as any single string known by both the client and the server which grants the client full
-access to requested resources. A client MAY possess multiple keys. A single key MAY have a scope associated with it
-that limits access, and the server SHOULD document such limitations for the client. The scope for a key SHOULD NOT be
-changed after it has been granted. The scope for a key MUST NOT be changed after it has been granted without
-notifying the client.
+Please review the [Authentication Discussion](https://github.ncsu.edu/ncsu-interop-group/ws-standards/issues/20).
 
-Static keys MUST NOT be used to take action on behalf of a user. All actions taken through authentication by static
-key MUST be attributed to the client. It is RECOMMENDED that static keys only be used when an end-user is not involved
-in the interaction, and the client should have explicit access to all requested resources.
 
-Authentication systems that use static keys MUST abide by the following constraints:
-
-* Keys consist of at least 8 alphanumeric characters
-* Keys do not contain characters outside the standard visible ASCII range (0x20-0x7E)
-
-It is RECOMMENDED that keys are constructed in such a manner that they are easily validated without a database
-lookup. This allows the system to drop malformed keys without consuming additional resources. Verification that
-the key is in use and what the scope is will require a lookup, but the syntactic validation of the key does not.
-Implementation of such construction is outside the scope of this document.
