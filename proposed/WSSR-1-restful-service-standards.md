@@ -130,8 +130,6 @@ allows a gist to be starred with ```PUT /gists/:id/star``` and unstarred with ``
 
 #### Filtering
 
-[Discuss more Advanced Filtering Options](#12)
-
 * APIs MUST use a unique query parameter for every resource field that implements filtering.
 * Filters MUST be mapped to the query string and MUST NOT be included in the resource mapping.
 * Multiple filters on one resource field MUST be separated by comma.
@@ -259,8 +257,6 @@ Content-Type: application/vendor.api-v1+json
 
 ### Use HTTP Response / Status Codes
 
-[Open for Discussion](#7)
-
 * 200 OK - Response to a successful GET, PUT, PATCH or DELETE.  Can also be used for a POST that doesn't result in a creation.
 * 201 Created - Response to a POST that results in a creation.
 * 202 Accepted - The request has been accepted for processing, but the processing has not been completed.
@@ -285,12 +281,13 @@ Content-Type: application/vendor.api-v1+json
 
 #### Handling Errors
 
-Error responses should include a common HTTP status code, message for the developer, message for the end-user (when appropriate), internal error code (corresponding to some specific internally determined error number), links where developers can find more info. For example:
+Error responses SHOULD include a common HTTP status code, message for the developer, and a message for the end-user (when appropriate). For example:
 
-    {
-        "status" : "400",
-        "developerMessage" : "Verbose, plain language description of the problem. Provide developers suggestions about how to solve their problems here",
-        "userMessage" : "This is a message that can be passed along to end-users, if needed.",
-        "errorCode" : "444444",
-        "moreInfo" : "Could include links to API documentation for resource request, etc",
-    }
+```
+{
+    "success": false,
+    "status": 404,
+    "user_message": "Plugin not found.",
+    "developer_message": "Plugin not found."
+}
+```
