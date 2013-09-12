@@ -13,7 +13,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 [RFC 2119]: http://www.ietf.org/rfc/rfc2119.txt
-[WSSR-0]: https://github.ncsu.edu/ncsu-interop-group/ws-standards/blob/master/proposed/WSSR-0-restful-constraints.md
+[WSSR-0]: https://github.ncsu.edu/ncsu-interop-group/ws-standards/blob/master/accepted/WSSR-0-restful-constraints.md
 [SEMVER]: http://semver.org/spec/v2.0.0-rc.2.html
 
 ## Overview
