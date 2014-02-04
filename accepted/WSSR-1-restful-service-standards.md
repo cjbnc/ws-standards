@@ -1,4 +1,4 @@
-# Basic RESTful Service Standards (DRAFT)
+# Basic RESTful Service Standards
 
 The intent of this document is to provide guidance on the implementation of RESTful web services according to the constraints set forth in [WSSR-0].
 It does so by enumerating a distributed set of rules, expectations, and best practices about how to build and maintain RESTful web services.
