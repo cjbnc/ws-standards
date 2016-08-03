@@ -32,10 +32,10 @@ The web service is assumed to consist of a number of application paths sharing a
 Every request must include an NCSU-MAC header containing the KEYID and the request signature computed using the KEYDATA. The header and signature should be created like this:
 
 
-    "NCSU-MAC: " + KEYID + ":" + base_64(hmac-sha1( METHOD + "\n"
-                                                  + PATH + "\n"
-                                                  + DATE + "\n"
-                                                  + CONTENT-MD5 ))
+    "NCSU-MAC: " + KEYID + ":" + base_64(hmac-sha256( METHOD + "\n"
+                                                    + PATH + "\n"
+                                                    + DATE + "\n"
+                                                    + CONTENT-MD5 ))
 
 - The METHOD is the HTTP method or verb to be used in this call. It will usually be one of (GET, PUT, POST, DELETE or PATCH).
 
@@ -45,7 +45,7 @@ Every request must include an NCSU-MAC header containing the KEYID and the reque
 
 - The CONTENT-MD5 string must contain the base-64 encoded MD5 checksum of the message content data. If the message contains no content (as in GET requests) the CONTENT-MD5 should be a an empty string for the purpose of calculating the signature. 
 
-The hmac-sha1 calculation should be seeded using the secret KEYDATA. The resulting signature should be base-64 encoded before including it in the NCSU-MAC header.
+The hmac-sha256 calculation should be seeded using the secret KEYDATA. The resulting signature should be base-64 encoded before including it in the NCSU-MAC header.  The previous iteration of this standard used hmac-sha1 for the signature calculation. This is no longer considered secure.
 
 ### Additional request headers
 
@@ -61,34 +61,34 @@ Example 1 - a simple GET request using these values:
 - BASEURL = "http://mosa.unity.ncsu.edu/pager"
 - PATH    = "/oncall/oit-iws"
 - METHOD  = "GET"
-- DATE    = "Wed, 14 Aug 2013 18:33:25 GMT"
+- DATE    = "Wed, 03 Aug 2016 13:03:02 GMT"
 - CONTENT-MD5 = ""
 
 ```
     GET http://mosa.unity.ncsu.edu/pager/oncall/oit-iws
-    Date: Wed, 14 Aug 2013 18:33:25 GMT
+    Date: Wed, 03 Aug 2016 13:03:02 GMT
     Accept: application/vendor.api-v1+json
-    User-Agent: NCSU-RESTclient/0.3.1
-    NCSU-MAC: test123:NbTCv3pArrZEkVbV37tBcpjYPSc
+    User-Agent: NCSU-RESTclient/0.4.1
+    NCSU-MAC: test123:IOlHeQG880wPoSb+78kROcEYcvKPVTyohJwzcjV6vH0
 
     (no content)
 ```
 
 Example 2 - a POST request with content
 - METHOD = "POST"
-- DATE = "Wed, 14 Aug 2013 18:35:30 GMT"
+- DATE = "Wed, 03 Aug 2016 13:06:36 GMT"
 - CONTENT = "foo=bar&baz=blu"
 - CONTENT-MD5 = "g26hErLKewirhYsLEW7mDg"
 
 ```
     POST http://mosa.unity.ncsu.edu/pager/oncall/oit-iws
-    Date: Wed, 14 Aug 2013 18:35:30 GMT
+    Date: Wed, 03 Aug 2016 13:06:36 GMT
     Accept: application/vendor.api-v1+json
-    User-Agent: NCSU-RESTclient/0.3.1
+    User-Agent: NCSU-RESTclient/0.4.1
     Content-Length: 15
     Content-MD5: g26hErLKewirhYsLEW7mDg
     Content-Type: application/x-www-form-urlencoded
-    NCSU-MAC: test123:j5m9Z8Wl+BeYdr0f1nMu0OQOueg
+    NCSU-MAC: test123:Dk8MwL8KkMm38ZB+dRjAg483ZYeXzu73jiZCjLAN5ZA
 
     foo=bar&baz=blu
 ```
@@ -104,7 +104,7 @@ The web service should perform each of the following steps when validating an in
 - For requests that contain content:
     - Require a valid Content-MD5 header.
     - Take the MD5 checksum of the passed content and verify that it matches the value given by the Content-MD5 header.
-- Look up the KEYDATA for the passed KEYID. Use that to calculate the hmac-sha1 signature for the request. Verify that the calculated signature matches the one passed in the NCSU-MAC header.
+- Look up the KEYDATA for the passed KEYID. Use that to calculate the hmac-sha256 signature for the request. Verify that the calculated signature matches the one passed in the NCSU-MAC header. For compatibility with older clients during an upgrade, services may also calculate the hmac-sha1 signature and check to see if that signature matches instead.
 
 ## Code examples
 
